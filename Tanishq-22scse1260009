@@ -1,0 +1,977 @@
+// 2. Write a program to find the sum of elements in a given range [L, R] using a prefix sum 
+array. Write its algorithm, program. Find its time and space complexities. Explain with 
+suitable example. 
+
+Code:
+public class PrefixSumRange {
+    public static int[] buildPrefixSum(int[] arr) {
+        int[] prefix = new int[arr.length];
+        prefix[0] = arr[0];
+        for (int i = 1; i < arr.length; i++) {
+            prefix[i] = prefix[i - 1] + arr[i];
+        }
+        return prefix;
+    }
+
+    public static int rangeSum(int[] prefix, int L, int R) {
+        if (L == 0) return prefix[R];
+        return prefix[R] - prefix[L - 1];
+    }
+
+    public static void main(String[] args) {
+        int[] arr = {1, 2, 3, 4, 5};
+        int[] prefix = buildPrefixSum(arr);
+        System.out.println("Sum from 1 to 3: " + rangeSum(prefix, 1, 3)); // Output: 9
+    }
+}
+
+
+// 3. Solve the problem of finding the equilibrium index in an array. Write its algorithm, 
+program. Find its time and space complexities. Explain with suitable example. 
+
+Code:
+public class EquilibriumIndex {
+    public static int findEquilibrium(int[] arr) {
+        int total = 0, leftSum = 0;
+        for (int num : arr) total += num;
+
+        for (int i = 0; i < arr.length; i++) {
+            total -= arr[i];
+            if (leftSum == total) return i;
+            leftSum += arr[i];
+        }
+        return -1;
+    }
+
+    public static void main(String[] args) {
+        int[] arr = {1, 3, 5, 2, 2};
+        System.out.println("Equilibrium index: " + findEquilibrium(arr)); // Output: 2
+    }
+}
+
+
+// 4. Check if an array can be split into two parts such that the sum of the prefix equals the 
+sum of the suffix. Write its algorithm, program. Find its time and space complexities. 
+Explain with suitable example. 
+
+Code:
+public class PrefixEqualsSuffix {
+    public static boolean canSplit(int[] arr) {
+        int total = 0, leftSum = 0;
+        for (int val : arr) total += val;
+
+        for (int i = 0; i < arr.length - 1; i++) {
+            leftSum += arr[i];
+            if (leftSum == total - leftSum) return true;
+        }
+        return false;
+    }
+
+    public static void main(String[] args) {
+        int[] arr = {1, 2, 3, 3};
+        System.out.println("Can split? " + canSplit(arr)); // Output: true
+    }
+}
+
+
+// 5. Find the maximum sum of any subarray of size K in a given array. Write its algorithm, 
+program. Find its time and space complexities. Explain with suitable example.  
+
+Code:
+public class MaxSubarraySumK {
+    public static int maxSum(int[] arr, int k) {
+        int windowSum = 0;
+        for (int i = 0; i < k; i++) windowSum += arr[i];
+        int maxSum = windowSum;
+
+        for (int i = k; i < arr.length; i++) {
+            windowSum += arr[i] - arr[i - k];
+            maxSum = Math.max(maxSum, windowSum);
+        }
+
+        return maxSum;
+    }
+
+    public static void main(String[] args) {
+        int[] arr = {1, 4, 2, 10, 2, 3, 1, 0, 20};
+        int k = 4;
+        System.out.println("Max sum of subarray size " + k + ": " + maxSum(arr, k)); // Output: 24
+    }
+}
+
+
+//6. Find the length of the longest substring without repeating characters. Write its 
+algorithm, program. Find its time and space complexities. Explain with suitable 
+example. 
+
+Code:
+import java.util.*;
+
+public class LongestUniqueSubstring {
+    public static int lengthOfLongestSubstring(String s) {
+        Set<Character> set = new HashSet<>();
+        int left = 0, maxLen = 0;
+
+        for (int right = 0; right < s.length(); right++) {
+            while (set.contains(s.charAt(right))) {
+                set.remove(s.charAt(left));
+                left++;
+            }
+            set.add(s.charAt(right));
+            maxLen = Math.max(maxLen, right - left + 1);
+        }
+        return maxLen;
+    }
+
+    public static void main(String[] args) {
+        String s = "abcabcbb";
+        System.out.println("Longest substring without repeating characters: " + lengthOfLongestSubstring(s)); // Output: 3
+    }
+}
+
+
+//8. Find the longest palindromic substring in a given string. Write its algorithm, program. 
+Find its time and space complexities. Explain with suitable example. 
+
+Code:
+public class LongestPalindrome {
+    public static String longestPalindrome(String s) {
+        if (s == null || s.length() < 1) return "";
+
+        int start = 0, end = 0;
+
+        for (int i = 0; i < s.length(); i++) {
+            int len1 = expand(s, i, i);
+            int len2 = expand(s, i, i + 1);
+            int len = Math.max(len1, len2);
+
+            if (len > end - start) {
+                start = i - (len - 1) / 2;
+                end = i + len / 2;
+            }
+        }
+
+        return s.substring(start, end + 1);
+    }
+
+    private static int expand(String s, int left, int right) {
+        while (left >= 0 && right < s.length() && s.charAt(left) == s.charAt(right)) {
+            left--;
+            right++;
+        }
+        return right - left - 1;
+    }
+
+    public static void main(String[] args) {
+        String input = "babad";
+        System.out.println("Longest Palindromic Substring: " + longestPalindrome(input)); // Output: "bab" or "aba"
+    }
+}
+
+
+//9. Find the longest common prefix among a list of strings. Write its algorithm, program. 
+Find its time and space complexities. Explain with suitable example.  
+
+Code:
+public class LongestCommonPrefix {
+    public static String longestCommonPrefix(String[] strs) {
+        if (strs == null || strs.length == 0) return "";
+
+        String prefix = strs[0];
+        for (int i = 1; i < strs.length; i++) {
+            while (!strs[i].startsWith(prefix)) {
+                prefix = prefix.substring(0, prefix.length() - 1);
+                if (prefix.isEmpty()) return "";
+            }
+        }
+
+        return prefix;
+    }
+
+    public static void main(String[] args) {
+        String[] words = {"flower", "flow", "flight"};
+        System.out.println("Longest Common Prefix: " + longestCommonPrefix(words)); // Output: "fl"
+    }
+}
+
+
+//10. Generate all permutations of a given string. Write its algorithm, program. Find its time 
+and space complexities. Explain with suitable example. 
+
+Code:
+public class StringPermutations {
+    public static void permute(String str, int l, int r) {
+        if (l == r)
+            System.out.println(str);
+        else {
+            for (int i = l; i <= r; i++) {
+                str = swap(str, l, i);
+                permute(str, l + 1, r);
+                str = swap(str, l, i); // backtrack
+            }
+        }
+    }
+
+    public static String swap(String a, int i, int j) {
+        char[] arr = a.toCharArray();
+        char temp = arr[i];
+        arr[i] = arr[j];
+        arr[j] = temp;
+        return String.valueOf(arr);
+    }
+
+    public static void main(String[] args) {
+        String str = "abc";
+        System.out.println("Permutations of " + str + ":");
+        permute(str, 0, str.length() - 1);
+    }
+}
+
+
+//11. Find two numbers in a sorted array that add up to a target. Write its algorithm, program. 
+Find its time and space complexities. Explain with suitable example. 
+
+Code:
+public class TwoSumSorted {
+    public static int[] twoSum(int[] nums, int target) {
+        int left = 0, right = nums.length - 1;
+
+        while (left < right) {
+            int sum = nums[left] + nums[right];
+
+            if (sum == target) return new int[]{nums[left], nums[right]};
+            else if (sum < target) left++;
+            else right--;
+        }
+
+        return new int[]{};
+    }
+
+    public static void main(String[] args) {
+        int[] nums = {1, 2, 4, 7, 11, 15};
+        int target = 15;
+        int[] result = twoSum(nums, target);
+        System.out.println("Pair: " + result[0] + " + " + result[1]);
+    }
+}
+
+
+//12. Rearrange numbers into the lexicographically next greater permutation. Write its 
+algorithm, program. Find its time and space complexities. Explain with suitable 
+example. 
+
+Code:
+import java.util.Arrays;
+
+public class NextPermutation {
+    public static void nextPermutation(int[] nums) {
+        int i = nums.length - 2;
+        while (i >= 0 && nums[i] >= nums[i + 1]) i--;
+
+        if (i >= 0) {
+            int j = nums.length - 1;
+            while (nums[j] <= nums[i]) j--;
+            swap(nums, i, j);
+        }
+
+        reverse(nums, i + 1, nums.length - 1);
+    }
+
+    private static void swap(int[] arr, int i, int j) {
+        int t = arr[i]; arr[i] = arr[j]; arr[j] = t;
+    }
+
+    private static void reverse(int[] arr, int start, int end) {
+        while (start < end) swap(arr, start++, end--);
+    }
+
+    public static void main(String[] args) {
+        int[] nums = {1, 2, 3};
+        nextPermutation(nums);
+        System.out.println(Arrays.toString(nums)); // Output: [1, 3, 2]
+    }
+}
+
+
+//13. How to merge two sorted linked lists into one sorted list. Write its algorithm, program. 
+Find its time and space complexities. Explain with suitable example. 
+
+Code:
+class ListNode {
+    int val;
+    ListNode next;
+    ListNode(int x) { val = x; }
+}
+
+public class MergeSortedLists {
+    public static ListNode mergeTwoLists(ListNode l1, ListNode l2) {
+        ListNode dummy = new ListNode(-1);
+        ListNode curr = dummy;
+
+        while (l1 != null && l2 != null) {
+            if (l1.val < l2.val) {
+                curr.next = l1;
+                l1 = l1.next;
+            } else {
+                curr.next = l2;
+                l2 = l2.next;
+            }
+            curr = curr.next;
+        }
+
+        curr.next = (l1 != null) ? l1 : l2;
+        return dummy.next;
+    }
+}
+
+
+//15. Find the k-th smallest element in a sorted matrix. Write its algorithm, program. Find its 
+time and space complexities. Explain with suitable example.  
+
+Code:
+public class KthSmallestMatrix {
+    public static int kthSmallest(int[][] matrix, int k) {
+        int n = matrix.length;
+        int low = matrix[0][0], high = matrix[n - 1][n - 1];
+
+        while (low < high) {
+            int mid = low + (high - low) / 2;
+            int count = 0, j = n - 1;
+
+            for (int i = 0; i < n; i++) {
+                while (j >= 0 && matrix[i][j] > mid) j--;
+                count += (j + 1);
+            }
+
+            if (count < k) low = mid + 1;
+            else high = mid;
+        }
+
+        return low;
+    }
+
+    public static void main(String[] args) {
+        int[][] matrix = {
+            {1, 5, 9},
+            {10, 11, 13},
+            {12, 13, 15}
+        };
+        int k = 8;
+        System.out.println("K-th Smallest: " + kthSmallest(matrix, k)); // Output: 13
+    }
+}
+
+
+//16. Find the majority element in an array that appears more than n/2 times. Write its 
+algorithm, program. Find its time and space complexities. Explain with suitable 
+example. 
+
+Code:
+public class MajorityElement {
+    public static int majorityElement(int[] nums) {
+        int count = 0, candidate = 0;
+
+        for (int num : nums) {
+            if (count == 0) candidate = num;
+            count += (num == candidate) ? 1 : -1;
+        }
+
+        return candidate;
+    }
+
+    public static void main(String[] args) {
+        int[] nums = {2, 2, 1, 1, 2, 2, 2};
+        System.out.println("Majority Element: " + majorityElement(nums)); // Output: 2
+    }
+}
+
+
+//17. Calculate how much water can be trapped between the bars of a histogram. Write its 
+algorithm, program. Find its time and space complexities. Explain with suitable 
+example.
+
+Code:
+public class TrappingRainWater {
+    public static int trap(int[] height) {
+        int left = 0, right = height.length - 1;
+        int leftMax = 0, rightMax = 0, water = 0;
+
+        while (left < right) {
+            if (height[left] < height[right]) {
+                if (height[left] >= leftMax) leftMax = height[left];
+                else water += leftMax - height[left];
+                left++;
+            } else {
+                if (height[right] >= rightMax) rightMax = height[right];
+                else water += rightMax - height[right];
+                right--;
+            }
+        }
+
+        return water;
+    }
+
+    public static void main(String[] args) {
+        int[] height = {0,1,0,2,1,0,1,3,2,1,2,1};
+        System.out.println("Water trapped: " + trap(height)); // Output: 6
+    }
+}
+
+
+//18. Find the maximum XOR of two numbers in an array. Write its algorithm, program. 
+Find its time and space complexities. Explain with suitable example. 
+
+Code:
+import java.util.HashSet;
+
+public class MaxXOR {
+    public static int findMaximumXOR(int[] nums) {
+        int max = 0, mask = 0;
+
+        for (int i = 31; i >= 0; i--) {
+            mask |= (1 << i);
+            HashSet<Integer> set = new HashSet<>();
+            for (int num : nums) set.add(num & mask);
+
+            int candidate = max | (1 << i);
+            for (int prefix : set) {
+                if (set.contains(prefix ^ candidate)) {
+                    max = candidate;
+                    break;
+                }
+            }
+        }
+
+        return max;
+    }
+
+    public static void main(String[] args) {
+        int[] nums = {3, 10, 5, 25, 2, 8};
+        System.out.println("Max XOR: " + findMaximumXOR(nums)); // Output: 28
+    }
+}
+
+
+//19. How to find the maximum product subarray. Write its algorithm, program. Find its time 
+and space complexities. Explain with suitable example. 
+
+Code:
+public class MaxProductSubarray {
+    public static int maxProduct(int[] nums) {
+        int max = nums[0], min = nums[0], result = nums[0];
+
+        for (int i = 1; i < nums.length; i++) {
+            int temp = max;
+            max = Math.max(nums[i], Math.max(nums[i] * max, nums[i] * min));
+            min = Math.min(nums[i], Math.min(nums[i] * temp, nums[i] * min));
+            result = Math.max(result, max);
+        }
+
+        return result;
+    }
+
+    public static void main(String[] args) {
+        int[] nums = {2, 3, -2, 4};
+        System.out.println("Max Product: " + maxProduct(nums)); // Output: 6
+    }
+}
+
+
+//20. Count all numbers with unique digits for a given number of digits. Write its algorithm, 
+program. Find its time and space complexities. Explain with suitable example. 
+
+Code:
+public class UniqueDigitNumbers {
+    public static int countNumbersWithUniqueDigits(int n) {
+        if (n == 0) return 1;
+
+        int result = 10, uniqueDigits = 9, available = 9;
+
+        for (int i = 2; i <= n && available > 0; i++) {
+            uniqueDigits *= available;
+            result += uniqueDigits;
+            available--;
+        }
+
+        return result;
+    }
+
+    public static void main(String[] args) {
+        int n = 2;
+        System.out.println("Unique digit numbers (n=2): " + countNumbersWithUniqueDigits(n)); // Output: 91
+    }
+}
+
+
+//21. How to count the number of 1s in the binary representation of numbers from 0 to n. 
+Write its algorithm, program. Find its time and space complexities. Explain with 
+suitable example. 
+
+Code:
+import java.util.Arrays;
+
+public class CountBits {
+    public static int[] countBits(int n) {
+        int[] res = new int[n + 1];
+        for (int i = 1; i <= n; i++) {
+            res[i] = res[i >> 1] + (i & 1);
+        }
+        return res;
+    }
+
+    public static void main(String[] args) {
+        int n = 5;
+        System.out.println("Bit counts: " + Arrays.toString(countBits(n))); // Output: [0, 1, 1, 2, 1, 2]
+    }
+}
+
+
+//22. How to check if a number is a power of two using bit manipulation. Write its algorithm, 
+program. Find its time and space complexities. Explain with suitable example. 
+
+Code:
+public class PowerOfTwo {
+    public static boolean isPowerOfTwo(int n) {
+        return n > 0 && (n & (n - 1)) == 0;
+    }
+
+    public static void main(String[] args) {
+        int n = 8;
+        System.out.println("Is Power of Two? " + isPowerOfTwo(n)); // true
+    }
+}
+
+
+//25. Solve the problem of finding the next greater element for each element in an array. 
+Write its algorithm, program. Find its time and space complexities. Explain with 
+suitable example.  
+
+Code:
+import java.util.*;
+
+public class NextGreaterElement {
+    public static int[] nextGreater(int[] nums) {
+        int[] res = new int[nums.length];
+        Stack<Integer> stack = new Stack<>();
+
+        for (int i = nums.length - 1; i >= 0; i--) {
+            while (!stack.isEmpty() && stack.peek() <= nums[i]) stack.pop();
+            res[i] = stack.isEmpty() ? -1 : stack.peek();
+            stack.push(nums[i]);
+        }
+
+        return res;
+    }
+
+    public static void main(String[] args) {
+        int[] nums = {4, 5, 2, 25};
+        System.out.println("Next Greater: " + Arrays.toString(nextGreater(nums))); // Output: [5, 25, 25, -1]
+    }
+}
+
+
+//26. Remove the n-th node from the end of a singly linked list. Write its algorithm, program. 
+Find its time and space complexities. Explain with suitable example. 
+
+Code:
+class ListNode {
+    int val;
+    ListNode next;
+    ListNode(int val) { this.val = val; }
+}
+
+public class RemoveNthNode {
+    public static ListNode removeNthFromEnd(ListNode head, int n) {
+        ListNode dummy = new ListNode(0);
+        dummy.next = head;
+        ListNode fast = dummy, slow = dummy;
+
+        for (int i = 0; i < n + 1; i++) fast = fast.next;
+        while (fast != null) {
+            fast = fast.next;
+            slow = slow.next;
+        }
+
+        slow.next = slow.next.next;
+        return dummy.next;
+    }
+}
+
+
+//27. Find the node where two singly linked lists intersect.  Write its algorithm, program. 
+Find its time and space complexities. Explain with suitable example. 
+
+Code:
+public class IntersectionNode {
+    public static ListNode getIntersection(ListNode headA, ListNode headB) {
+        ListNode a = headA, b = headB;
+        while (a != b) {
+            a = (a == null) ? headB : a.next;
+            b = (b == null) ? headA : b.next;
+        }
+        return a;
+    }
+}
+
+
+//28. Implement two stacks in a single array. Write its algorithm, program. Find its time and 
+space complexities. Explain with suitable example.
+
+Code:
+public class TwoStacks {
+    int[] arr;
+    int top1, top2;
+
+    public TwoStacks(int size) {
+        arr = new int[size];
+        top1 = -1;
+        top2 = size;
+    }
+
+    public void push1(int val) {
+        if (top1 + 1 < top2) arr[++top1] = val;
+    }
+
+    public void push2(int val) {
+        if (top1 + 1 < top2) arr[--top2] = val;
+    }
+
+    public int pop1() {
+        return (top1 >= 0) ? arr[top1--] : -1;
+    }
+
+    public int pop2() {
+        return (top2 < arr.length) ? arr[top2++] : -1;
+    }
+}
+
+
+//29. Write a program to check if an integer is a palindrome without converting it to a string. 
+Write its algorithm, program. Find its time and space complexities. Explain with 
+suitable example. 
+
+Code:
+public class PalindromeNumber {
+    public static boolean isPalindrome(int x) {
+        if (x < 0 || (x % 10 == 0 && x != 0)) return false;
+
+        int reversed = 0;
+        while (x > reversed) {
+            reversed = reversed * 10 + x % 10;
+            x /= 10;
+        }
+
+        return x == reversed || x == reversed / 10;
+    }
+
+    public static void main(String[] args) {
+        System.out.println(isPalindrome(121)); // true
+        System.out.println(isPalindrome(123)); // false
+    }
+}
+
+
+//31. Use a deque to find the maximum in every sliding window of size K. Write its 
+algorithm, program. Find its time and space complexities. Explain with suitable 
+example. 
+
+Code:
+import java.util.*;
+
+public class MaxInSlidingWindow {
+    public static int[] maxSlidingWindow(int[] nums, int k) {
+        Deque<Integer> dq = new ArrayDeque<>();
+        int[] result = new int[nums.length - k + 1];
+        int ri = 0;
+
+        for (int i = 0; i < nums.length; i++) {
+            if (!dq.isEmpty() && dq.peek() < i - k + 1) dq.poll();
+            while (!dq.isEmpty() && nums[dq.peekLast()] < nums[i]) dq.pollLast();
+            dq.offer(i);
+            if (i >= k - 1) result[ri++] = nums[dq.peek()];
+        }
+
+        return result;
+    }
+
+    public static void main(String[] args) {
+        int[] nums = {1, 3, -1, -3, 5, 3, 6, 7};
+        int k = 3;
+        System.out.println("Max in windows: " + Arrays.toString(maxSlidingWindow(nums, k))); // [3,3,5,5,6,7]
+    }
+}
+
+
+//32. How to find the largest rectangle that can be formed in a histogram. Write its algorithm, 
+program. Find its time and space complexities. Explain with suitable example.
+
+Code:
+import java.util.Stack;
+
+public class LargestRectangle {
+    public static int largestRectangleArea(int[] heights) {
+        Stack<Integer> stack = new Stack<>();
+        int maxArea = 0, i = 0;
+
+        while (i <= heights.length) {
+            int h = (i == heights.length) ? 0 : heights[i];
+            if (stack.isEmpty() || h >= heights[stack.peek()]) {
+                stack.push(i++);
+            } else {
+                int top = stack.pop();
+                int width = stack.isEmpty() ? i : i - 1 - stack.peek();
+                maxArea = Math.max(maxArea, heights[top] * width);
+            }
+        }
+
+        return maxArea;
+    }
+
+    public static void main(String[] args) {
+        int[] heights = {2,1,5,6,2,3};
+        System.out.println("Largest Rectangle Area: " + largestRectangleArea(heights)); // Output: 10
+    }
+}
+
+
+//34. Solve the problem of finding the subarray sum equal to K using hashing. Write its 
+algorithm, program. Find its time and space complexities. Explain with suitable 
+example. 
+
+Code:
+import java.util.HashMap;
+
+public class SubarraySumEqualsK {
+    public static int subarraySum(int[] nums, int k) {
+        HashMap<Integer, Integer> map = new HashMap<>();
+        map.put(0, 1);
+        int sum = 0, count = 0;
+
+        for (int num : nums) {
+            sum += num;
+            count += map.getOrDefault(sum - k, 0);
+            map.put(sum, map.getOrDefault(sum, 0) + 1);
+        }
+
+        return count;
+    }
+
+    public static void main(String[] args) {
+        int[] nums = {1, 1, 1};
+        int k = 2;
+        System.out.println("Count of subarrays with sum = k: " + subarraySum(nums, k)); // Output: 2
+    }
+}
+
+
+//35. Find the k-most frequent elements in an array using a priority queue. Write its 
+algorithm, program. Find its time and space complexities. Explain with suitable 
+example.
+
+Code:
+import java.util.*;
+
+public class TopKFrequent {
+    public static int[] topKFrequent(int[] nums, int k) {
+        HashMap<Integer, Integer> freq = new HashMap<>();
+        for (int n : nums) freq.put(n, freq.getOrDefault(n, 0) + 1);
+
+        PriorityQueue<Integer> heap = new PriorityQueue<>((a, b) -> freq.get(a) - freq.get(b));
+
+        for (int key : freq.keySet()) {
+            heap.offer(key);
+            if (heap.size() > k) heap.poll();
+        }
+
+        int[] result = new int[k];
+        for (int i = k - 1; i >= 0; i--) result[i] = heap.poll();
+        return result;
+    }
+
+    public static void main(String[] args) {
+        int[] nums = {1,1,1,2,2,3};
+        int k = 2;
+        System.out.println("Top K frequent: " + Arrays.toString(topKFrequent(nums, k))); // Output: [1,2]
+    }
+}
+
+
+//36. Generate all subsets of a given array. Write its algorithm, program. Find its time and 
+space complexities. Explain with suitable example. 
+
+Code:
+import java.util.*;
+
+public class SubsetsGenerator {
+    public static List<List<Integer>> subsets(int[] nums) {
+        List<List<Integer>> res = new ArrayList<>();
+        backtrack(res, new ArrayList<>(), nums, 0);
+        return res;
+    }
+
+    private static void backtrack(List<List<Integer>> res, List<Integer> temp, int[] nums, int start) {
+        res.add(new ArrayList<>(temp));
+        for (int i = start; i < nums.length; i++) {
+            temp.add(nums[i]);
+            backtrack(res, temp, nums, i + 1);
+            temp.remove(temp.size() - 1);
+        }
+    }
+
+    public static void main(String[] args) {
+        int[] nums = {1, 2};
+        System.out.println("Subsets: " + subsets(nums));
+    }
+}
+
+
+//37. Find all unique combinations of numbers that sum to a target. Write its algorithm, 
+program. Find its time and space complexities. Explain with suitable example. 
+
+Code:
+import java.util.*;
+
+public class CombinationSum {
+    public static List<List<Integer>> combinationSum(int[] candidates, int target) {
+        List<List<Integer>> res = new ArrayList<>();
+        backtrack(res, new ArrayList<>(), candidates, target, 0);
+        return res;
+    }
+
+    private static void backtrack(List<List<Integer>> res, List<Integer> temp, int[] nums, int remain, int start) {
+        if (remain < 0) return;
+        if (remain == 0) res.add(new ArrayList<>(temp));
+        else {
+            for (int i = start; i < nums.length; i++) {
+                temp.add(nums[i]);
+                backtrack(res, temp, nums, remain - nums[i], i);
+                temp.remove(temp.size() - 1);
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        int[] candidates = {2, 3, 6, 7};
+        int target = 7;
+        System.out.println("Combinations: " + combinationSum(candidates, target));
+    }
+}
+
+
+//38. Generate all permutations of a given array. Write its algorithm, program. Find its time 
+and space complexities. Explain with suitable example.
+
+Code:
+import java.util.*;
+
+public class Permutations {
+    public static List<List<Integer>> permute(int[] nums) {
+        List<List<Integer>> res = new ArrayList<>();
+        backtrack(res, new ArrayList<>(), nums);
+        return res;
+    }
+
+    private static void backtrack(List<List<Integer>> res, List<Integer> temp, int[] nums) {
+        if (temp.size() == nums.length) {
+            res.add(new ArrayList<>(temp));
+        } else {
+            for (int num : nums) {
+                if (temp.contains(num)) continue;
+                temp.add(num);
+                backtrack(res, temp, nums);
+                temp.remove(temp.size() - 1);
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        int[] nums = {1, 2, 3};
+        System.out.println("Permutations: " + permute(nums));
+    }
+}
+
+
+//40. Solve the problem of finding the element with maximum frequency in an array. Write 
+its algorithm, program. Find its time and space complexities. Explain with suitable 
+example. 
+
+Code:
+import java.util.*;
+
+public class MaxFrequency {
+    public static int maxFrequencyElement(int[] nums) {
+        HashMap<Integer, Integer> map = new HashMap<>();
+        int maxFreq = 0, element = nums[0];
+
+        for (int num : nums) {
+            int freq = map.getOrDefault(num, 0) + 1;
+            map.put(num, freq);
+            if (freq > maxFreq) {
+                maxFreq = freq;
+                element = num;
+            }
+        }
+
+        return element;
+    }
+
+    public static void main(String[] args) {
+        int[] nums = {1, 3, 2, 3, 4, 3, 5};
+        System.out.println("Element with max frequency: " + maxFrequencyElement(nums)); // Output: 3
+    }
+}
+
+
+//41. Write a program to find the maximum subarray sum using Kadane’s algorithm.
+
+Code:
+public class KadanesAlgorithm {
+    public static int maxSubArray(int[] nums) {
+        int maxSoFar = nums[0];
+        int currentSum = nums[0];
+
+        for (int i = 1; i < nums.length; i++) {
+            currentSum = Math.max(nums[i], currentSum + nums[i]);
+            maxSoFar = Math.max(maxSoFar, currentSum);
+        }
+
+        return maxSoFar;
+    }
+
+    public static void main(String[] args) {
+        int[] nums = {-2, 1, -3, 4, -1, 2, 1, -5, 4};
+        System.out.println("Max Subarray Sum: " + maxSubArray(nums)); // Output: 6
+    }
+}
+
+
+//44. How to find two numbers in an array that add up to a target using hashing. Write its 
+algorithm, program. Find its time and space complexities. Explain with suitable 
+example. 
+
+Code:
+import java.util.*;
+
+public class TwoSumHashing {
+    public static int[] twoSum(int[] nums, int target) {
+        Map<Integer, Integer> map = new HashMap<>();
+
+        for (int i = 0; i < nums.length; i++) {
+            int diff = target - nums[i];
+            if (map.containsKey(diff)) {
+                return new int[]{map.get(diff), i};
+            }
+            map.put(nums[i], i);
+        }
+
+        return new int[]{};
+    }
+
+    public static void main(String[] args) {
+        int[] nums = {2, 7, 11, 15};
+        int target = 9;
+        int[] res = twoSum(nums, target);
+        System.out.println("Indices: " + res[0] + ", " + res[1]); // Output: 0, 1
+    }
+}
+
